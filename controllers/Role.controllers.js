@@ -5,11 +5,15 @@ const createRole = async (req, res) => {
   const { name } = req.body;
 
   try {
+    // Vérifier que le champ name est présent
+    if (!name) {
+      return res.status(400).json({ message: 'Le nom du rôle est requis.' });
+    }
+
     // Vérifier si le rôle existe déjà
     const existingRole = await Role.findOne({ name });
-
     if (existingRole) {
-      return res.status(400).json({ message: 'Ce rôle existe déjà' });
+      return res.status(400).json({ message: 'Ce rôle existe déjà.' });
     }
 
     // Créer et sauvegarder le nouveau rôle
@@ -49,10 +53,21 @@ const updateRole = async (req, res) => {
   const { name } = req.body;
 
   try {
+    // Vérifier que l'ID est valide
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'ID du rôle invalide.' });
+    }
+
+    // Vérifier que le champ name est présent
+    if (!name) {
+      return res.status(400).json({ message: 'Le nom du rôle est requis.' });
+    }
+
+    // Mettre à jour le rôle
     const updatedRole = await Role.findByIdAndUpdate(id, { name }, { new: true });
 
     if (!updatedRole) {
-      return res.status(404).json({ message: 'Rôle non trouvé' });
+      return res.status(404).json({ message: 'Rôle non trouvé.' });
     }
 
     return res.status(200).json({
@@ -73,10 +88,16 @@ const deleteRole = async (req, res) => {
   const { id } = req.params;
 
   try {
+    // Vérifier que l'ID est valide
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'ID du rôle invalide.' });
+    }
+
+    // Supprimer le rôle
     const deletedRole = await Role.findByIdAndDelete(id);
 
     if (!deletedRole) {
-      return res.status(404).json({ message: 'Rôle non trouvé' });
+      return res.status(404).json({ message: 'Rôle non trouvé.' });
     }
 
     return res.status(200).json({

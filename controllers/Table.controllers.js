@@ -5,20 +5,31 @@ const createTable = async (req, res) => {
   const { name } = req.body;
 
   try {
+    // Vérifier que le champ name est présent
+    if (!name) {
+      return res.status(400).json({ message: 'Le nom de la table est requis.' });
+    }
+
     // Vérifier si une table avec ce nom existe déjà
     const existingTable = await Table.findOne({ name });
     if (existingTable) {
-      return res.status(400).json({ message: 'Cette table existe déjà' });
+      return res.status(400).json({ message: 'Cette table existe déjà.' });
     }
 
     // Créer une nouvelle table
     const newTable = new Table({ name });
     await newTable.save();
 
-    return res.status(201).json({ message: 'Table créée avec succès', table: newTable });
+    return res.status(201).json({
+      message: 'Table créée avec succès',
+      table: newTable,
+    });
   } catch (error) {
     console.error('Erreur lors de la création de la table:', error);
-    return res.status(500).json({ message: 'Erreur lors de la création de la table', error: error.message });
+    return res.status(500).json({
+      message: 'Erreur lors de la création de la table',
+      error: error.message,
+    });
   }
 };
 
@@ -29,7 +40,10 @@ const getAllTables = async (req, res) => {
     return res.status(200).json(tables);
   } catch (error) {
     console.error('Erreur lors de la récupération des tables:', error);
-    return res.status(500).json({ message: 'Erreur lors de la récupération des tables', error: error.message });
+    return res.status(500).json({
+      message: 'Erreur lors de la récupération des tables',
+      error: error.message,
+    });
   }
 };
 
@@ -39,16 +53,33 @@ const updateTable = async (req, res) => {
   const { name } = req.body;
 
   try {
+    // Vérifier que l'ID est valide
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'ID de la table invalide.' });
+    }
+
+    // Vérifier que le champ name est présent
+    if (!name) {
+      return res.status(400).json({ message: 'Le nom de la table est requis.' });
+    }
+
+    // Mettre à jour la table
     const updatedTable = await Table.findByIdAndUpdate(id, { name }, { new: true });
 
     if (!updatedTable) {
-      return res.status(404).json({ message: 'Table non trouvée' });
+      return res.status(404).json({ message: 'Table non trouvée.' });
     }
 
-    return res.status(200).json({ message: 'Table mise à jour avec succès', table: updatedTable });
+    return res.status(200).json({
+      message: 'Table mise à jour avec succès',
+      table: updatedTable,
+    });
   } catch (error) {
     console.error('Erreur lors de la mise à jour de la table:', error);
-    return res.status(500).json({ message: 'Erreur lors de la mise à jour de la table', error: error.message });
+    return res.status(500).json({
+      message: 'Erreur lors de la mise à jour de la table',
+      error: error.message,
+    });
   }
 };
 
@@ -57,16 +88,28 @@ const deleteTable = async (req, res) => {
   const { id } = req.params;
 
   try {
+    // Vérifier que l'ID est valide
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'ID de la table invalide.' });
+    }
+
+    // Supprimer la table
     const deletedTable = await Table.findByIdAndDelete(id);
 
     if (!deletedTable) {
-      return res.status(404).json({ message: 'Table non trouvée' });
+      return res.status(404).json({ message: 'Table non trouvée.' });
     }
 
-    return res.status(200).json({ message: 'Table supprimée avec succès', table: deletedTable });
+    return res.status(200).json({
+      message: 'Table supprimée avec succès',
+      table: deletedTable,
+    });
   } catch (error) {
     console.error('Erreur lors de la suppression de la table:', error);
-    return res.status(500).json({ message: 'Erreur lors de la suppression de la table', error: error.message });
+    return res.status(500).json({
+      message: 'Erreur lors de la suppression de la table',
+      error: error.message,
+    });
   }
 };
 
@@ -74,5 +117,5 @@ module.exports = {
   createTable,
   getAllTables,
   updateTable,
-  deleteTable
+  deleteTable,
 };

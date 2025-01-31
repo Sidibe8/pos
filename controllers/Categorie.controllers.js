@@ -1,15 +1,20 @@
 const Categorie = require('../models/Categorie.model');
+const mongoose = require('mongoose');
 
 // Créer une nouvelle catégorie
 const createCategorie = async (req, res) => {
   const { name } = req.body;
 
   try {
+    // Vérifier que le champ name est présent
+    if (!name) {
+      return res.status(400).json({ message: 'Le nom de la catégorie est requis.' });
+    }
+
     // Vérifier si la catégorie existe déjà
     const existingCategorie = await Categorie.findOne({ name });
-
     if (existingCategorie) {
-      return res.status(400).json({ message: 'Cette catégorie existe déjà' });
+      return res.status(400).json({ message: 'Une catégorie avec ce nom existe déjà.' });
     }
 
     // Créer la catégorie
@@ -40,10 +45,27 @@ const updateCategorie = async (req, res) => {
   const { name } = req.body;
 
   try {
+    // Vérifier que l'ID est valide
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'ID de la catégorie invalide.' });
+    }
+
+    // Vérifier que le champ name est présent
+    if (!name) {
+      return res.status(400).json({ message: 'Le nom de la catégorie est requis.' });
+    }
+
+    // Vérifier si la catégorie existe déjà avec le même nom
+    const existingCategorie = await Categorie.findOne({ name });
+    if (existingCategorie && existingCategorie._id.toString() !== id) {
+      return res.status(400).json({ message: 'Une catégorie avec ce nom existe déjà.' });
+    }
+
+    // Mettre à jour la catégorie
     const updatedCategorie = await Categorie.findByIdAndUpdate(id, { name }, { new: true });
 
     if (!updatedCategorie) {
-      return res.status(404).json({ message: 'Catégorie non trouvée' });
+      return res.status(404).json({ message: 'Catégorie non trouvée.' });
     }
 
     return res.status(200).json({ message: 'Catégorie mise à jour avec succès', categorie: updatedCategorie });
@@ -58,10 +80,16 @@ const deleteCategorie = async (req, res) => {
   const { id } = req.params;
 
   try {
+    // Vérifier que l'ID est valide
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'ID de la catégorie invalide.' });
+    }
+
+    // Supprimer la catégorie
     const deletedCategorie = await Categorie.findByIdAndDelete(id);
 
     if (!deletedCategorie) {
-      return res.status(404).json({ message: 'Catégorie non trouvée' });
+      return res.status(404).json({ message: 'Catégorie non trouvée.' });
     }
 
     return res.status(200).json({ message: 'Catégorie supprimée avec succès', categorie: deletedCategorie });
