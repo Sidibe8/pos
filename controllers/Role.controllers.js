@@ -1,5 +1,5 @@
 const Role = require('../models/Role.model');
-
+const mongoose = require('mongoose')
 // Créer un nouveau rôle
 const createRole = async (req, res) => {
   const { name } = req.body;
